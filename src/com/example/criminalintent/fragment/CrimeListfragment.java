@@ -3,9 +3,11 @@ package com.example.criminalintent.fragment;
 import java.util.List;
 
 import com.example.criminalfragment.R;
+import com.example.criminalintent.CrimeActivity;
 import com.example.criminalintent.entity.Crime;
 import com.example.criminalintent.entity.CrimeLab;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.text.format.DateFormat;
@@ -39,9 +41,18 @@ public class CrimeListfragment extends ListFragment {
 	public void onListItemClick(ListView l, View v, int position, long id) {
 //		Crime c = (Crime)(getListAdapter().getItem(position));
 		Crime c = ((CrimeAdapter)getListAdapter()).getItem(position);
-		Log.d(tag, c.getTitle()+" was clicked");
+		Intent intent = new Intent(getActivity(), CrimeActivity.class);
+		intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, c.getId());
+		startActivity(intent);
+//		Log.d(tag, c.getTitle()+" was clicked");
 	}
 	
+	@Override
+	public void onResume() {
+		super.onResume();
+		((CrimeAdapter)getListAdapter()).notifyDataSetChanged();
+	}
+
 	private class CrimeAdapter extends ArrayAdapter<Crime> {
 
 		public CrimeAdapter(List<Crime> crimes) {
@@ -65,7 +76,6 @@ public class CrimeListfragment extends ListFragment {
 			
 			return convertView;
 		}
-		
 	}
 	
 	
