@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.criminalfragment.R;
 import com.example.criminalintent.CrimeActivity;
+import com.example.criminalintent.CrimePageActivity;
 import com.example.criminalintent.entity.Crime;
 import com.example.criminalintent.entity.CrimeLab;
 
@@ -41,10 +42,11 @@ public class CrimeListfragment extends ListFragment {
 	public void onListItemClick(ListView l, View v, int position, long id) {
 //		Crime c = (Crime)(getListAdapter().getItem(position));
 		Crime c = ((CrimeAdapter)getListAdapter()).getItem(position);
-		Intent intent = new Intent(getActivity(), CrimeActivity.class);
+//		Intent intent = new Intent(getActivity(), CrimeActivity.class);
+		Intent intent = new Intent(getActivity(), CrimePageActivity.class);
 		intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, c.getId());
 		startActivity(intent);
-//		Log.d(tag, c.getTitle()+" was clicked");
+		Log.d(tag, c.getTitle()+" was clicked");
 	}
 	
 	@Override
