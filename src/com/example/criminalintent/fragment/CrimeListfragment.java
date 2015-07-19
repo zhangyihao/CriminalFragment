@@ -55,13 +55,11 @@ public class CrimeListfragment extends ListFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-//		View v = super.onCreateView(inflater, container, savedInstanceState);
 		if(container!=null) {
 			container.removeAllViews();
 		}
 		View v = inflater.inflate(R.layout.fragment_crime_list, container);
-//		container.addView(v);
-		if(mAdapter.getCount()==0) {
+		if(mAdapter==null || mAdapter.getCount()==0) {
 			mListView = (ListView)v.findViewById(R.id.crime_list);
 			mEmptyTextView = new TextView(getActivity());  
 			mEmptyTextView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
