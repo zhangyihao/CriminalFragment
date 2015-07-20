@@ -2,6 +2,12 @@ package com.example.criminalintent.fragment;
 
 import java.util.List;
 
+import com.example.criminalfragment.R;
+import com.example.criminalintent.CrimeActivity;
+import com.example.criminalintent.CrimePageActivity;
+import com.example.criminalintent.entity.Crime;
+import com.example.criminalintent.entity.CrimeLab;
+
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
@@ -20,11 +26,6 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.example.criminalfragment.R;
-import com.example.criminalintent.CrimePageActivity;
-import com.example.criminalintent.entity.Crime;
-import com.example.criminalintent.entity.CrimeLab;
 
 public class CrimeListfragment extends ListFragment {
 
@@ -78,11 +79,10 @@ public class CrimeListfragment extends ListFragment {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-//		Crime c = (Crime)(getListAdapter().getItem(position));
 		Crime c = ((CrimeAdapter)getListAdapter()).getItem(position);
-//		Intent intent = new Intent(getActivity(), CrimeActivity.class);
 		Intent intent = new Intent(getActivity(), CrimePageActivity.class);
-		intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, c.getId());
+		intent.putExtra(CrimeFragmentConst.EXTRA_CRIME_ID, c.getId());
+		intent.putExtra(CrimeFragmentConst.EXTRA_CRIME_OPERATOR, CrimeFragmentConst.CRIM_OPERATOR_SHOW);
 		startActivity(intent);
 		Log.d(tag, c.getTitle()+" was clicked");
 	}
@@ -108,10 +108,8 @@ public class CrimeListfragment extends ListFragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 			case R.id.menu_item_new_crime:
-				Crime crime = new Crime();
-				CrimeLab.getInstance(getActivity()).add(crime);
-				Intent intent = new Intent(getActivity(), CrimePageActivity.class);
-				intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.getId());
+				Intent intent = new Intent(getActivity(), CrimeActivity.class);
+				intent.putExtra(CrimeFragmentConst.EXTRA_CRIME_OPERATOR, CrimeFragmentConst.CRIME_OPERATOR_ADD);
 				startActivityForResult(intent, 0);
 				return true;
 			case R.id.menu_item_show_subtitle:
@@ -129,7 +127,7 @@ public class CrimeListfragment extends ListFragment {
 				return super.onOptionsItemSelected(item);
 		}
 	}
-
+	
 	private class CrimeAdapter extends ArrayAdapter<Crime> {
 
 		public CrimeAdapter(List<Crime> crimes) {

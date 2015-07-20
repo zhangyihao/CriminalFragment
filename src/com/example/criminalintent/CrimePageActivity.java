@@ -19,6 +19,7 @@ import com.example.criminalfragment.R;
 import com.example.criminalintent.entity.Crime;
 import com.example.criminalintent.entity.CrimeLab;
 import com.example.criminalintent.fragment.CrimeFragment;
+import com.example.criminalintent.fragment.CrimeFragmentConst;
 
 public class CrimePageActivity extends FragmentActivity {
 	private ViewPager mViewPager;
@@ -27,12 +28,14 @@ public class CrimePageActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
+		FragmentManager fm = getSupportFragmentManager();
+		UUID crimeID = (UUID)getIntent().getSerializableExtra(CrimeFragmentConst.EXTRA_CRIME_ID);
+
 		mViewPager = new ViewPager(this);
 		mViewPager.setId(R.id.ViewPager);
 		setContentView(mViewPager);
 		
 		mCrimes = CrimeLab.getInstance(this).getCrimes();
-		FragmentManager fm = getSupportFragmentManager();
 		mViewPager.setAdapter(new FragmentStatePagerAdapter(fm) {
 			
 			@Override
@@ -43,11 +46,10 @@ public class CrimePageActivity extends FragmentActivity {
 			@Override
 			public Fragment getItem(int pos) {
 				Crime crime = mCrimes.get(pos);
-				return CrimeFragment.newInstance(crime.getId());
+				return CrimeFragment.newInstance(crime==null?null:crime.getId(), CrimeFragmentConst.CRIM_OPERATOR_SHOW);
 			}
 		});
 		
-		UUID crimeID = (UUID)getIntent().getSerializableExtra(CrimeFragment.EXTRA_CRIME_ID);
 		for(int i=0; i<mCrimes.size(); i++) {
 			if(mCrimes.get(i).getId().equals(crimeID)) {
 				mViewPager.setCurrentItem(i);

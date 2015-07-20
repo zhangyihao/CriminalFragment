@@ -19,5 +19,6 @@
     <string name="delete_crime">Delete</string>
     
     <string name="crime_list_empty">没有记录!!!!!!</string>
+    <string name="crime_add_button">Add</string>
     
 </resources>
