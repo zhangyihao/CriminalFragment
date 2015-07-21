@@ -7,9 +7,10 @@ import com.example.criminalfragment.R;
 import com.example.criminalintent.CrimeListActivity;
 import com.example.criminalintent.entity.Crime;
 import com.example.criminalintent.entity.CrimeLab;
-
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -62,13 +63,20 @@ public class CrimeFragment extends Fragment {
 		if(crimeId!=null) {
 			this.mCrime = CrimeLab.getInstance(getActivity()).getCrime(crimeId);
 		}
+		setHasOptionsMenu(true);
 	}
 
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		//生成View，第三个参数，通知布局管理器是否将生成的视图添加给父视图，此处为false，将通过代码方式添加视图
 		View v = inflater.inflate(R.layout.fragment_crime, container, false);
+		
+		if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB && NavUtils.getParentActivityName(getActivity())!=null) {
+			getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+		}
+		
 		mTitleField = (EditText) v.findViewById(R.id.crime_title);
 		mDateButton = (Button)v.findViewById(R.id.crime_date);
 		mSolvedCheckBox = (CheckBox)v.findViewById(R.id.crime_solved);
@@ -87,9 +95,10 @@ public class CrimeFragment extends Fragment {
 							return;
 						}
 						CrimeLab.getInstance(getActivity()).add(mCrime);
-						Intent intent = new Intent(getActivity(), CrimeListActivity.class);
-						startActivity(intent);
-						getActivity().finish();
+						NavUtils.navigateUpFromSameTask(getActivity());
+//						Intent intent = new Intent(getActivity(), CrimeListActivity.class);
+//						startActivity(intent);
+//						getActivity().finish();
 					}
 				});
 				break;
