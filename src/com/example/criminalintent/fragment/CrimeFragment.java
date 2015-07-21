@@ -3,10 +3,6 @@ package com.example.criminalintent.fragment;
 import java.util.Date;
 import java.util.UUID;
 
-import com.example.criminalfragment.R;
-import com.example.criminalintent.CrimeListActivity;
-import com.example.criminalintent.entity.Crime;
-import com.example.criminalintent.entity.CrimeLab;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -19,10 +15,15 @@ import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.view.ActionMode;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -30,6 +31,10 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.criminalfragment.R;
+import com.example.criminalintent.entity.Crime;
+import com.example.criminalintent.entity.CrimeLab;
 
 public class CrimeFragment extends Fragment {
 
@@ -39,6 +44,8 @@ public class CrimeFragment extends Fragment {
 	private CheckBox mSolvedCheckBox;
 	private Button mAddButton;
 	private int operator;
+	
+	private ActionMode mActionMode = null;
 	
 	private static final String DIALOG_DATE = "date";
 	private static final int REQUEST_DATE = 0;
@@ -72,6 +79,57 @@ public class CrimeFragment extends Fragment {
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		//生成View，第三个参数，通知布局管理器是否将生成的视图添加给父视图，此处为false，将通过代码方式添加视图
 		View v = inflater.inflate(R.layout.fragment_crime, container, false);
+		
+		switch (operator) {
+		case CrimeFragmentConst.CRIM_OPERATOR_SHOW:
+			if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB && NavUtils.getParentActivityName(getActivity())!=null) {
+				v.setOnLongClickListener(new OnLongClickListener() {
+					
+					@Override
+					public boolean onLongClick(View v) {
+						if(mActionMode!=null) {
+							return false;
+						}
+						mActionMode = getActivity().startActionMode(new ActionMode.Callback() {
+							
+							@Override
+							public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+								return false;
+							}
+							
+							@Override
+							public void onDestroyActionMode(ActionMode mode) {
+							}
+							
+							@Override
+							public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+								mode.getMenuInflater().inflate(R.menu.crime_list_item_context, menu);
+								return true;
+							}
+							
+							@Override
+							public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+								switch(item.getItemId()) {
+								case R.id.menu_item_delete_crime:
+									CrimeLab.getInstance(getActivity()).delete(mCrime);
+									mode.finish();
+									NavUtils.navigateUpFromSameTask(getActivity());
+									return true;
+								default:
+									return false;
+								}
+							}
+						});
+						return false;
+					}
+				});
+			} else {
+				registerForContextMenu(v);
+			}
+			break;
+		default:
+			break;
+		}
 		
 		if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB && NavUtils.getParentActivityName(getActivity())!=null) {
 			getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -183,5 +241,21 @@ public class CrimeFragment extends Fragment {
                 return super.onOptionsItemSelected(item);
         } 
     }
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+		case R.id.menu_item_delete_crime:
+			CrimeLab.getInstance(getActivity()).delete(mCrime);
+			NavUtils.navigateUpFromSameTask(getActivity());
+			return true;
+		}
+		return super.onContextItemSelected(item);
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		getActivity().getMenuInflater().inflate(R.menu.crime_list_item_context, menu);
+	}
 	
 }
