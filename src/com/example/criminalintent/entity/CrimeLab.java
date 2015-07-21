@@ -22,7 +22,8 @@ public class CrimeLab {
 		this.mAppContext = appContext;
 		mSerializer = new CrimeIntentJSONSerializer(appContext, FILENAME);
 		try {
-			mCrimes = mSerializer.loadCrimes();
+//			mCrimes = mSerializer.loadCrimes();
+			mCrimes = mSerializer.loadCrimesWithSDCard();
 		} catch (IOException | JSONException e) {
 			Log.e(TAG, "Error happing...", e);
 		}
@@ -56,7 +57,8 @@ public class CrimeLab {
 	
 	public boolean saveCrime() {
 		try {
-			mSerializer.saveCrimes(mCrimes);
+//			mSerializer.saveCrimes(mCrimes);
+			mSerializer.saveCrimesWithSDCard(mCrimes);
 			return true;
 		} catch (JSONException | IOException e) {
 			e.printStackTrace();

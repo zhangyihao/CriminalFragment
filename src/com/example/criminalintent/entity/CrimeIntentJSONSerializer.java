@@ -4,21 +4,23 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.RandomAccessFile;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import android.content.Context;
 import android.os.Environment;
+import android.util.Log;
 
 public class CrimeIntentJSONSerializer {
 
@@ -87,14 +89,15 @@ public class CrimeIntentJSONSerializer {
 		File sdCardDir = Environment.getExternalStorageDirectory();
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new InputStreamReader(new FileInputStream(sdCardDir.getCanonicalFile()+mFileName)));
+			File file = checkFileIsExits(sdCardDir.getCanonicalPath(), mFileName);
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			StringBuilder sb = new StringBuilder();
 			String line = null;
 			while((line = reader.readLine())!=null) {
 				sb.append(line);
 			}
 			if(sb.length()>0) {
-				JSONArray array = (JSONArray) new JSONTokener(sb.toString()).nextValue();
+				JSONArray array = new JSONArray(sb.toString());
 				for(int i=0; i<array.length(); i++) {
 					crimes.add(new Crime(array.getJSONObject(i)));
 				}
@@ -117,11 +120,22 @@ public class CrimeIntentJSONSerializer {
 				array.put(crime.toJSONObject());
 			}
 			File sdCardDir = Environment.getExternalStorageDirectory();
-			File file = new File(sdCardDir.getCanonicalPath()+mFileName);
-			RandomAccessFile raf= new RandomAccessFile(file, "rw");
-			raf.seek(file.length());
-			raf.write(array.toString().getBytes());
-			raf.close();
+			File file = checkFileIsExits(sdCardDir.getCanonicalPath(), mFileName);
+			FileOutputStream output = new FileOutputStream(file);
+			output.write(array.toString().getBytes());
+			output.close();
 		}
+	}
+	
+	private File checkFileIsExits(String dir, String fileName) {
+		File file = new File(dir, fileName);
+		if(!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return file;
 	}
 }
