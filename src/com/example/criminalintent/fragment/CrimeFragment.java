@@ -3,16 +3,11 @@ package com.example.criminalintent.fragment;
 import java.util.Date;
 import java.util.UUID;
 
-import com.example.criminalfragment.R;
-import com.example.criminalintent.CrimeCameraActivity;
-import com.example.criminalintent.entity.Crime;
-import com.example.criminalintent.entity.CrimeLab;
-import com.example.criminalintent.entity.Photo;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,7 +35,15 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.example.criminalfragment.R;
+import com.example.criminalintent.CrimeCameraActivity;
+import com.example.criminalintent.entity.Crime;
+import com.example.criminalintent.entity.CrimeLab;
+import com.example.criminalintent.entity.Photo;
+import com.example.criminalintent.entity.PictureUtils;
 
 public class CrimeFragment extends Fragment {
 
@@ -50,11 +53,14 @@ public class CrimeFragment extends Fragment {
 	private CheckBox mSolvedCheckBox;
 	private Button mAddButton;
 	private ImageButton mTakePictureButton;
+	private ImageView mPhotoView;
+	
 	private int operator;
 	
 	private ActionMode mActionMode = null;
 	
 	private static final String DIALOG_DATE = "date";
+	private static final String DIALOG_IMAGE = "image";
 	private static final int REQUEST_DATE = 0;
 	private static final int REQUEST_PHOTO = 1;
 	
@@ -150,6 +156,7 @@ public class CrimeFragment extends Fragment {
 		mSolvedCheckBox = (CheckBox)v.findViewById(R.id.crime_solved);
 		mAddButton = (Button)v.findViewById(R.id.crime_add);
 		mTakePictureButton = (ImageButton)v.findViewById(R.id.crime_imageButton);
+		mPhotoView = (ImageView)v.findViewById(R.id.crime_imageView);
 		
 		PackageManager pm = getActivity().getPackageManager();
 		boolean hasACamera = pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT) || //前置摄像头
@@ -229,6 +236,22 @@ public class CrimeFragment extends Fragment {
 			}
 		});
 		
+		mPhotoView.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Photo p = mCrime.getPhoto();
+				if(p==null) {
+					return;
+				}
+				
+				FragmentManager fm = getActivity().getSupportFragmentManager(); 
+				String path = getActivity().getFileStreamPath(p.getFileName()).getAbsolutePath();
+				ImageFragment.newInstance(path).show(fm, DIALOG_DATE);
+				
+			}
+		});
+		
 		return v;
 	}
 
@@ -246,6 +269,7 @@ public class CrimeFragment extends Fragment {
 			if(fileName!=null) {
 				Photo photo = new Photo(fileName);
 				mCrime.setPhoto(photo);
+				showPhoto();
 				Log.i(TAG, "Crime: "+mCrime.getTitle()+"has a photo, fileName:"+fileName);
 			}
 		}
@@ -255,7 +279,19 @@ public class CrimeFragment extends Fragment {
 //		mDateButton.setText(DateFormat.format("yyyy/MM/dd HH:mm:ss", mCrime.getDate()));
 		mDateButton.setText(DateFormat.format("yyyy/MM/dd", mCrime.getDate()));
 	}
+	
+	@Override
+	public void onStart() {
+		super.onStart();
+		showPhoto();
+	}
 
+	@Override
+	public void onStop() {
+		super.onStop();
+		PictureUtils.cleanImageView(mPhotoView);
+	}
+	
 	@Override
 	public void onPause() {
 		super.onPause();
@@ -287,6 +323,16 @@ public class CrimeFragment extends Fragment {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		getActivity().getMenuInflater().inflate(R.menu.crime_list_item_context, menu);
+	}
+	
+	private void showPhoto() {
+		Photo p = mCrime.getPhoto();
+		BitmapDrawable b = null;
+		if(p!=null) {
+			String path = getActivity().getFileStreamPath(p.getFileName()).getAbsolutePath();
+			b = PictureUtils.getScaleDrawable(getActivity(), path);
+		}
+		mPhotoView.setImageDrawable(b);
 	}
 	
 }

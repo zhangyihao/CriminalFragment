@@ -25,6 +25,7 @@ public class CrimePageActivity extends FragmentActivity {
 	private ViewPager mViewPager;
 	private List<Crime> mCrimes;
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);

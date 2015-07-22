@@ -94,7 +94,6 @@ public class CrimeCameraFragment extends Fragment {
 				if(mCamera!=null) {
 					mCamera.takePicture(mShutterCallback, null, mJpegCallback);
 				}
-				getActivity().finish();
 			}
 		});
 		
