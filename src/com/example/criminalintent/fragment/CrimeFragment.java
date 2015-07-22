@@ -3,9 +3,17 @@ package com.example.criminalintent.fragment;
 import java.util.Date;
 import java.util.UUID;
 
+import com.example.criminalfragment.R;
+import com.example.criminalintent.CrimeCameraActivity;
+import com.example.criminalintent.entity.Crime;
+import com.example.criminalintent.entity.CrimeLab;
+import com.example.criminalintent.entity.Photo;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,6 +23,7 @@ import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -30,11 +39,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
-
-import com.example.criminalfragment.R;
-import com.example.criminalintent.entity.Crime;
-import com.example.criminalintent.entity.CrimeLab;
 
 public class CrimeFragment extends Fragment {
 
@@ -43,12 +49,16 @@ public class CrimeFragment extends Fragment {
 	private Button mDateButton;
 	private CheckBox mSolvedCheckBox;
 	private Button mAddButton;
+	private ImageButton mTakePictureButton;
 	private int operator;
 	
 	private ActionMode mActionMode = null;
 	
 	private static final String DIALOG_DATE = "date";
 	private static final int REQUEST_DATE = 0;
+	private static final int REQUEST_PHOTO = 1;
+	
+	private final String TAG = "CrimeFragment";
 
 	public static CrimeFragment newInstance(UUID crimeId, int operator) {
 		Bundle bundle = new Bundle();
@@ -139,6 +149,23 @@ public class CrimeFragment extends Fragment {
 		mDateButton = (Button)v.findViewById(R.id.crime_date);
 		mSolvedCheckBox = (CheckBox)v.findViewById(R.id.crime_solved);
 		mAddButton = (Button)v.findViewById(R.id.crime_add);
+		mTakePictureButton = (ImageButton)v.findViewById(R.id.crime_imageButton);
+		
+		PackageManager pm = getActivity().getPackageManager();
+		boolean hasACamera = pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT) || //前置摄像头
+				pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)|| //后置摄像头
+				Build.VERSION.SDK_INT<Build.VERSION_CODES.GINGERBREAD || Camera.getNumberOfCameras()>0;
+		if(!hasACamera) {
+			mTakePictureButton.setEnabled(false);
+		}
+		mTakePictureButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getActivity(), CrimeCameraActivity.class);
+				startActivityForResult(intent, REQUEST_PHOTO);
+			}
+		});
 		
 		switch (this.operator) {
 			case CrimeFragmentConst.CRIME_OPERATOR_ADD:
@@ -154,9 +181,6 @@ public class CrimeFragment extends Fragment {
 						}
 						CrimeLab.getInstance(getActivity()).add(mCrime);
 						NavUtils.navigateUpFromSameTask(getActivity());
-//						Intent intent = new Intent(getActivity(), CrimeListActivity.class);
-//						startActivity(intent);
-//						getActivity().finish();
 					}
 				});
 				break;
@@ -217,6 +241,13 @@ public class CrimeFragment extends Fragment {
 			Date date = (Date)data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
 			mCrime.setDate(date);
 			updateDate();
+		} else if(requestCode == REQUEST_PHOTO) {
+			String fileName = (String)data.getSerializableExtra(CrimeCameraFragment.EXTRA_PHOTO_FILENAME);
+			if(fileName!=null) {
+				Photo photo = new Photo(fileName);
+				mCrime.setPhoto(photo);
+				Log.i(TAG, "Crime: "+mCrime.getTitle()+"has a photo, fileName:"+fileName);
+			}
 		}
 	}
 	

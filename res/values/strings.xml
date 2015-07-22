@@ -21,4 +21,6 @@
     <string name="crime_list_empty">没有记录!!!!!!</string>
     <string name="crime_add_button">Add</string>
     
+    <string name="crime_camera_take">Take</string>
+    <string name="crime_camera_description">click to take a picture</string>
 </resources>

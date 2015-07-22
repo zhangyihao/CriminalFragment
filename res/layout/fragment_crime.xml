@@ -4,19 +4,46 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/crime_title_label"
-        style="?android:listSeparatorTextViewStyle"/>
-    
-    <EditText
-        android:id="@+id/crime_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:hint="@string/crime_title_hint" />
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+	    android:layout_marginLeft="16dp"
+	    android:layout_marginTop="16dp" >
+	    
+	    <LinearLayout android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:orientation="vertical"
+	        android:layout_marginRight="4dp" >
+
+	        <ImageButton android:id="@+id/crime_imageButton"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:src="@android:drawable/ic_menu_camera"
+	            android:contentDescription="@string/crime_camera_description" />	        
+	    </LinearLayout>
+	    
+	    <LinearLayout android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:orientation="vertical"
+	        android:layout_marginRight="4dp" >
+	        
+		    <TextView 
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:text="@string/crime_title_label"
+		        style="?android:listSeparatorTextViewStyle"/>
+		    
+		    <EditText
+		        android:id="@+id/crime_title"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_marginLeft="16dp"
+		        android:layout_marginRight="16dp"
+		        android:hint="@string/crime_title_hint" />
+		    
+	    </LinearLayout>
+    </LinearLayout>
     
     <TextView 
         android:layout_width="match_parent"
