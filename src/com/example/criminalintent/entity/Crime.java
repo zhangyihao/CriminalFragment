@@ -6,18 +6,22 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 public class Crime {
 	private UUID mId;
 	private String mTitle;
 	private Date mDate;
 	private boolean mSolved;
 	private Photo mPhoto;
+	private String mSuspect;
 	
 	public static final String JSON_ID = "id";
 	public static final String JSON_TITLE = "title";
 	public static final String JSON_SOLVED = "solved";
 	public static final String JSON_DATE = "date";
 	public static final String JSON_PHOTO = "photo";
+	public static final String JSON_SUSPECT = "suspect";
 	
 	public Crime() {
 		mId = UUID.randomUUID();
@@ -25,12 +29,16 @@ public class Crime {
 	}
 	
 	public Crime(JSONObject json) throws JSONException {
+		Log.v("CrimeFragment", json.toString());
 		this.mId = UUID.fromString(json.getString(JSON_ID));
 		this.mTitle = json.getString(JSON_TITLE);
 		this.mDate = new Date(json.getLong(JSON_DATE));
 		this.mSolved = json.getBoolean(JSON_SOLVED);
 		if(json.has(JSON_PHOTO)) {
 			mPhoto = new Photo(json.getJSONObject(JSON_PHOTO));
+		}
+		if(json.has(JSON_SUSPECT)) {
+			mSuspect = json.getString(JSON_SUSPECT);
 		}
 	}
 	
@@ -71,6 +79,14 @@ public class Crime {
 	public void setPhoto(Photo photo) {
 		mPhoto = photo;
 	}
+	
+	public String getSuspect() {
+		return mSuspect;
+	}
+
+	public void setSuspect(String suspect) {
+		mSuspect = suspect;
+	}
 
 	public JSONObject toJSONObject() throws JSONException {
 		JSONObject json = new JSONObject();
@@ -79,7 +95,10 @@ public class Crime {
 		json.put(JSON_SOLVED, this.mSolved);
 		json.put(JSON_DATE, this.mDate.getTime());
 		if(mPhoto!=null) {
-			json.put(JSON_SOLVED, this.mPhoto.toJson());
+			json.put(JSON_PHOTO, this.mPhoto.toJson());
+		}
+		if(mSuspect!=null && !"".equals(mSuspect)) {
+			json.put(JSON_SUSPECT, mSuspect);
 		}
 		return json;
 	}
